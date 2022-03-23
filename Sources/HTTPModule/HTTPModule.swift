@@ -248,8 +248,8 @@ public class HTTPClient<ConcreteEndpoint: HTTPEndpoint>: HTTPClientProtocol {
         on queueType: HTTPClientQueue,
         completion: @escaping HTTPClientCompletion
     ) {
-        selectQueue(from: queueType).sync { [weak self] in
-            self?.fetch(endpoint, completion: completion)
+        selectQueue(from: queueType).sync {
+            self.fetch(endpoint, completion: completion)
         }
     }
     
@@ -259,9 +259,9 @@ public class HTTPClient<ConcreteEndpoint: HTTPEndpoint>: HTTPClientProtocol {
         after delayInSeconds: Double,
         completion: @escaping HTTPClientCompletion
     ) {
-        selectQueue(from: queueType).sync { [weak self] in
+        selectQueue(from: queueType).sync {
             Thread.sleep(forTimeInterval: delayInSeconds)
-            self?.fetch(endpoint, completion: completion)
+            self.fetch(endpoint, completion: completion)
         }
     }
     
@@ -270,8 +270,8 @@ public class HTTPClient<ConcreteEndpoint: HTTPEndpoint>: HTTPClientProtocol {
         on queueType: HTTPClientQueue,
         completion: @escaping HTTPClientCompletion
     ) {
-        selectQueue(from: queueType).async { [weak self] in
-            self?.fetch(endpoint, completion: completion)
+        selectQueue(from: queueType).async {
+            self.fetch(endpoint, completion: completion)
         }
     }
     
@@ -281,16 +281,13 @@ public class HTTPClient<ConcreteEndpoint: HTTPEndpoint>: HTTPClientProtocol {
         after delayInSeconds: Double,
         completion: @escaping HTTPClientCompletion
     ) {
-        selectQueue(from: queueType).asyncAfter(deadline: .now() + delayInSeconds) { [weak self] in
-            self?.fetch(endpoint, completion: completion)
+        selectQueue(from: queueType).asyncAfter(deadline: .now() + delayInSeconds) {
+            self.fetch(endpoint, completion: completion)
         }
     }
     
     private func fetch(_ endpoint: ConcreteEndpoint, completion: @escaping HTTPClientCompletion) {
-        router.resume(endpoint) { [weak self] (data, response, error) in
-            guard let self = self else {
-                return completion(.failure(.unknownError))
-            }
+        router.resume(endpoint) { (data, response, error) in
             if error != nil {
                 return completion(.failure(.connectionError))
             }
